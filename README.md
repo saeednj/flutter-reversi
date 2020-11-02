@@ -1,8 +1,5 @@
-# reversi
+# Reversi in Flutter
 
-The game of Reversi
+This project is an implementation of the Reversi game as a Flutter application, mainly to learn and get familiar with flutter.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
+It contains an AI player that uses an alpha-beta tree search.
