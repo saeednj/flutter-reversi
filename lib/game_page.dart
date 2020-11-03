@@ -12,12 +12,13 @@ const int INF = 2000000000; // infinity
 const Color EmptyCellColor = Colors.white10;
 const CellColors = {X: Colors.black54, O: Colors.red};
 const PlayerNames = {X: "Black", O: "Red"};
-const int thinkingDepth = 2;
+const ThinkingDepth = {"Easy": 1, "Medium": 2, "Hard": 4};
 
 class GamePage extends StatefulWidget {
   final String title;
+  final String difficulty;
 
-  GamePage(this.title);
+  GamePage({this.title, this.difficulty = "Easy"});
 
   @override
   GamePageState createState() => GamePageState();
@@ -28,6 +29,7 @@ class GamePageState extends State<GamePage> {
   int _currentPlayer;
   var _cnt;
   String _info;
+  int _thinkingDepth;
 
   @override
   void initState() {
@@ -48,6 +50,9 @@ class GamePageState extends State<GamePage> {
     _cnt = {X: 2, O: 2};
 
     _info = '';
+    _thinkingDepth = ThinkingDepth[widget.difficulty];
+
+    print(_thinkingDepth);
   }
 
   @override
@@ -75,7 +80,7 @@ class GamePageState extends State<GamePage> {
   }
 
   void _AImove() {
-    Move m = _findBestMove(_currentPlayer, thinkingDepth, -INF, INF, _currentPlayer);
+    Move m = _findBestMove(_currentPlayer, _thinkingDepth, -INF, INF, _currentPlayer);
     _update(m.x, m.y);
   }
 
@@ -104,7 +109,7 @@ class GamePageState extends State<GamePage> {
 
   Widget _buildCell(int r, int c) {
     return GestureDetector(
-      onTap: () => _handleTap(r, c),
+      onTap: () => _userMove(r, c),
       child: Container(
         width: 40,
         height: 40,
@@ -133,7 +138,7 @@ class GamePageState extends State<GamePage> {
     board[i][j] = peg;
   }
 
-  _handleTap(int r, int c) {
+  _userMove(int r, int c) {
     _update(r, c);
   }
 
@@ -169,7 +174,7 @@ class GamePageState extends State<GamePage> {
       for(int dy=-1; dy<=1; dy++) {
         var opponent = false, self = false;
         for(int i=x+dx,j=y+dy; _inRange(i, j); i+=dx,j+=dy) {
-          if (board[i][j] == 0) break;
+          if (board[i][j] == EMPTY) break;
           if (board[i][j] == player) {
             self = true;
             break;
@@ -191,7 +196,7 @@ class GamePageState extends State<GamePage> {
 
     for(int i=0; i<BOARD_SIZE; i++)
       for(int j=0; j<BOARD_SIZE; j++)
-        if (board[i][j] == 0 && _isValid(i, j, player))
+        if (board[i][j] == EMPTY && _isValid(i, j, player))
           return true;
 
      return false;
@@ -214,7 +219,7 @@ class GamePageState extends State<GamePage> {
         var opponent = false, self = false;
         int i = x+dx, j = y+dy;
         for(; _inRange(i, j); i+=dx,j+=dy) {
-          if (board[i][j] == 0) break;
+          if (board[i][j] == EMPTY) break;
           if (board[i][j] == player) { self = true; break; }
           else opponent = true;
         }
@@ -268,8 +273,8 @@ class GamePageState extends State<GamePage> {
 
     for(int i=0; i<BOARD_SIZE && !cut; i++)
       for(int j=0; j<BOARD_SIZE && !cut; j++) {
-        if ( !_isValid(i, j, player) ) continue;
-        if ( xx == -1 ) { xx = i; yy = j; }
+        if (!_isValid(i, j, player)) continue;
+        if (xx == -1) { xx = i; yy = j; }
 
         tmpBoard = [for(var L in board) [...L]];
         tmpCnt = Map.from(_cnt);
@@ -297,7 +302,7 @@ class GamePageState extends State<GamePage> {
           cut = true;
       }
 
-    if ( notMoved ) {
+    if (notMoved) {
       tmpBoard = [for(var L in board) [...L]];
       tmpCnt = Map.from(_cnt);
 

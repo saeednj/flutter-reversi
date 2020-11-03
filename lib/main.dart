@@ -32,6 +32,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String difficulty;
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +44,33 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Text("Welcome to Reversi", style: TextStyle(fontSize: 24),),
+          DropdownButton<String>(
+            value: difficulty,
+            onChanged: (String newValue) {
+              setState(() {
+                difficulty = newValue;
+              });
+            },
+            items: <String>['Easy', 'Medium', 'Hard']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            hint: Text('Select AI Level'),
+          ),
           Center(
             child: RaisedButton(
               onPressed: (){
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => GamePage(widget.title))
+                    MaterialPageRoute(
+                        builder: (context) => GamePage(title: widget.title, difficulty: difficulty)
+                    )
                 );
               },
-              color: Colors.amber,
+              color: Colors.greenAccent,
               child: Text("New Game", style: TextStyle(fontSize: 24),),
             ),
           )
