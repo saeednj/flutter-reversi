@@ -51,8 +51,6 @@ class GamePageState extends State<GamePage> {
 
     _info = '';
     _thinkingDepth = ThinkingDepth[widget.difficulty];
-
-    print(_thinkingDepth);
   }
 
   @override
@@ -73,7 +71,6 @@ class GamePageState extends State<GamePage> {
   }
 
   void afterBuild(BuildContext context) {
-    //print("After build called");
     if (_currentPlayer == O) {
       var timer = Timer(Duration(seconds: 1), () => _AImove());
     }
@@ -115,12 +112,18 @@ class GamePageState extends State<GamePage> {
         height: 40,
         margin: EdgeInsets.all(1),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey, width: 1),
+          border: _getBorder(r, c),
           color: EmptyCellColor,
         ),
         child: _buildPeg(r, c),
       ),
     );
+  }
+
+  _getBorder(int r, int c) {
+    if (_currentPlayer == X && _isValid(r, c, X))
+      return Border.all(color: Colors.green, width: 2);
+    return Border.all(color: Colors.grey, width: 1);
   }
 
   Widget _buildPeg(int r, int c) {
@@ -168,7 +171,7 @@ class GamePageState extends State<GamePage> {
 
   bool _isValid(int x, int y, int player) {
     if (!_inRange(x, y))  return false;
-    if (board[x][y] != 0) return false;
+    if (board[x][y] != EMPTY) return false;
 
     for(int dx=-1; dx<=1; dx++)
       for(int dy=-1; dy<=1; dy++) {
@@ -196,7 +199,7 @@ class GamePageState extends State<GamePage> {
 
     for(int i=0; i<BOARD_SIZE; i++)
       for(int j=0; j<BOARD_SIZE; j++)
-        if (board[i][j] == EMPTY && _isValid(i, j, player))
+        if (_isValid(i, j, player))
           return true;
 
      return false;
